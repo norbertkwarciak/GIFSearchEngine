@@ -14,30 +14,35 @@ App = React.createClass({
         this.setState({
             loading: true  
         });
-        this.getGif(searchingText, function (gif) {  
+        this.getGif(searchingText).then((gif) => {  // 'then' method is executed when a promise returns a correct result ('resolve' method is executed)
             this.setState({  
                 loading: false,  
                 gif: gif,  
                 searchingText: searchingText  
             });
-        }.bind(this));
+        // }.bind(this)); // it is no longer needed, as thanks to arrow function 'this' directly refers to the component now
+        });
     },
 
-    getGif: function (searchingText, callback) {  
-        var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;  
-        var xhr = new XMLHttpRequest();  
-        xhr.open('GET', url);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText).data; 
-                var gif = {  
-                    url: data.fixed_width_downsampled_url,
-                    sourceUrl: data.url
-                };
-                callback(gif);  
+    getGif: function (searchingText) { // getGif function is getting packed into a promise
+        return new Promise((resolve, reject) => { 
+            var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;  
+            var xhr = new XMLHttpRequest();  
+            xhr.open('GET', url);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText).data; 
+                    var gif = {  
+                        url: data.fixed_width_downsampled_url,
+                        sourceUrl: data.url
+                    };
+                    resolve(gif); 
+                } else { // handling an error
+                        reject('Something went wrong');
+                } 
             }
-        };
-        xhr.send();
+            xhr.send();
+        });
     },
 
     render: function () {
