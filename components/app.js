@@ -21,7 +21,7 @@ App = React.createClass({
                 searchingText: searchingText  
             });
         // }.bind(this)); // it is no longer needed, as thanks to arrow function 'this' directly refers to the component now
-        });
+        }).catch(error => console.log('An error has occurred'));
     },
 
     getGif: function (searchingText) { // getGif function is getting packed into a promise
